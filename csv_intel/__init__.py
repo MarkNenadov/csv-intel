@@ -25,7 +25,7 @@ def process(path):
 
 	for cols in reader:
 		total = total + 1
-		populate_distribs_for_colum(col, distribs)
+		populate_distribs_for_column(col, distribs)
 
 	print '%d entries' % total
 	for i,col in enumerate(columns):
