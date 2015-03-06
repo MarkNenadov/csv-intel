@@ -25,7 +25,7 @@ def process(path):
 
 	for cols in reader:
 		total = total + 1
-		populate_distribs_for_column(col, distribs)
+		populate_distribs_for_columns(cols, columns, distribs)
 
 	print '%d entries' % total
 	for i,col in enumerate(columns):
@@ -33,14 +33,14 @@ def process(path):
 
 	print 'Numerics:'
 	for col in columns:
-		process_numerics_column(col, distribs)
+		process_numerics_column(col, distribs, total)
 
 	f.close()
 
 def average(seq):
 	return sum(seq)*1.0/len(seq)
 
-def populate_distribs_for_column(col, distribs):
+def populate_distribs_for_columns(cols, columns, distribs):
 	for i,col in enumerate(cols):
 		distribs[columns[i]]['value'][col] = distribs[columns[i]]['value'].get(col, 0) + 1
 		if col.strip() == '':
@@ -52,7 +52,7 @@ def populate_distribs_for_column(col, distribs):
 			except ValueError:
 				pass
 
-def process_numerics_column(col, distribs):
+def process_numerics_column(col, distribs, total):
 	numeric_values = distribs[col]['numeric_values']
 	if (distribs[col]['numeric']*1.0) / total > 0.7:
 		print_numeric_value_stats(numeric_values, distribs)
