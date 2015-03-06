@@ -25,17 +25,7 @@ def process(path):
 
 	for cols in reader:
 		total = total + 1
-
-		for i,col in enumerate(cols):
-			distribs[columns[i]]['value'][col] = distribs[columns[i]]['value'].get(col, 0) + 1
-			if col.strip() == '':
-				distribs[columns[i]]['empty'] += 1
-			try:
-				v = float(col)
-				distribs[columns[i]]['numeric'] += 1
-				distribs[columns[i]]['numeric_values'].append(v)
-			except ValueError:
-				pass
+		populate_distribs_for_colum(col, distribs)
 
 	print '%d entries' % total
 	for i,col in enumerate(columns):
@@ -51,18 +41,22 @@ def process(path):
 
 	f.close()
 
+def populate_distribs_for_column(col, distribs):
+	for i,col in enumerate(cols):
+		distribs[columns[i]]['value'][col] = distribs[columns[i]]['value'].get(col, 0) + 1
+		if col.strip() == '':
+			distribs[columns[i]]['empty'] += 1
+			try:
+				v = float(col)
+				distribs[columns[i]]['numeric'] += 1
+				distribs[columns[i]]['numeric_values'].append(v)
+			except ValueError:
+				pass
+
 def process_numerics_column(col, distribs):
-	numeric_values = get_numeric_values(distribs, col)
+	numeric_values = distribs[col]['numeric_values']
 	if (distribs[col]['numeric']*1.0) / total > 0.7:
-		print '\t%s: %f - %f (avg: %r, non-0 avg: %r, median: %f, mode: %r)' % (
-			col,
-			min(numeric_values),
-			max(numeric_values),
-			average(numeric_values),
-			average([x for x in numeric_values if x != 0]),
-			numeric_values[len(numeric_values)/2],
-			max(distribs[col]['value'].items(), key=lambda x: x[1])[0]
-			)
+		print_numeric_value_stats(numeric_values, distribs)
 		if distexplore_enabled:
 			distexplore.distribution_file('distributions/%s-%s.html' % (filename_pure, col),
 				col,
@@ -72,9 +66,18 @@ def process_numerics_column(col, distribs):
 				col,
 				[x for x in numeric_values if x != 0],
 				circular=False, freqrep=True)
-	
-def get_numeric_values(distribs, col):
-	return distribs[col]['numeric_values']
+
+def print_numeric_value_stats(numeric_values, distribs):
+	print '\t%s: %f - %f (avg: %r, non-0 avg: %r, median: %f, mode: %r)' % (
+		col,
+		min(numeric_values),
+		max(numeric_values),
+		average(numeric_values),
+		average([x for x in numeric_values if x != 0]),
+		numeric_values[len(numeric_values)/2],
+		max(distribs[col]['value'].items(), key=lambda x: x[1])[0]
+		)
+
 
 def print_entry_distribs(i, col, distribs, total):
 	print '\t(%d) %s: %d unique (%.2f%%)\n\t\t%d empty (%.2f%%),\n\t\t%d numeric (%.2f%%)' % (
