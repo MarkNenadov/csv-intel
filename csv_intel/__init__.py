@@ -31,15 +31,14 @@ def process(path):
 	for i,col in enumerate(columns):
 		print_entry_distribs(i, col, distribs, total)
 
-	def average(seq):
-		return sum(seq)*1.0/len(seq)
-
-
 	print 'Numerics:'
 	for col in columns:
 		process_numerics_column(col, distribs)
 
 	f.close()
+
+def average(seq):
+	return sum(seq)*1.0/len(seq)
 
 def populate_distribs_for_column(col, distribs):
 	for i,col in enumerate(cols):
